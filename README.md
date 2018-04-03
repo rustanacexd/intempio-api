@@ -1,8 +1,5 @@
 # intempio-api
 
-[![Build Status](https://travis-ci.org/rustanacexd/intempio-api.svg?branch=master)](https://travis-ci.org/rustanacexd/intempio-api)
-[![Built with](https://img.shields.io/badge/Built_with-Cookiecutter_Django_Rest-F7B633.svg)](https://github.com/agconti/cookiecutter-django-rest)
-
 todo. Check out the project's [documentation](http://rustanacexd.github.io/intempio-api/).
 
 # Prerequisites
@@ -24,52 +21,3 @@ Run a command inside the docker container:
 docker-compose run --rm web [command]
 ```
 
-# Continuous Deployment
-
-Deployment is automated via Travis. When builds pass on the master or qa branch, Travis will deploy that branch to Heroku. Follow these steps to enable this feature.
-
-Initialize the production server:
-
-```
-heroku create intempio_api-prod --remote prod && \
-    heroku addons:create newrelic:wayne --app intempio_api-prod && \
-    heroku addons:create heroku-postgresql:hobby-dev --app intempio_api-prod && \
-    heroku config:set DJANGO_SECRET_KEY=`openssl rand -base64 32` \
-        DJANGO_AWS_ACCESS_KEY_ID="Add your id" \
-        DJANGO_AWS_SECRET_ACCESS_KEY="Add your key" \
-        DJANGO_AWS_STORAGE_BUCKET_NAME="intempio_api-prod" \
-        DJANGO_CONFIGURATION="Production" \
-        DJANGO_SETTINGS_MODULE="intempio_api.config" \
-        --app intempio_api-prod
-```
-
-Initialize the qa server:
-
-```
-heroku create intempio_api-qa --remote qa && \
-    heroku addons:create newrelic:wayne --app intempio_api-qa && \
-    heroku addons:create heroku-postgresql:hobby-dev --app intempio_api-qa && \
-    heroku config:set DJANGO_SECRET_KEY=`openssl rand -base64 32` \
-        DJANGO_AWS_ACCESS_KEY_ID="Add your id" \
-        DJANGO_AWS_SECRET_ACCESS_KEY="Add your key" \
-        DJANGO_AWS_STORAGE_BUCKET_NAME="intempio_api-qa" \
-        DJANGO_CONFIGURATION="Production" \
-        DJANGO_SETTINGS_MODULE="intempio_api.config" \
-        --app intempio_api-qa
-```
-
-Securely add your Heroku credentials to Travis so that it can automatically deploy your changes:
-
-```bash
-travis encrypt HEROKU_AUTH_TOKEN="$(heroku auth:token)" --add
-```
-
-Commit your changes and push to master and qa to trigger your first deploys:
-
-```bash
-git commit -a -m "ci(travis): add Heroku credentials" && \
-git push origin master:qa && \
-git push origin master
-```
-
-You're now ready to continuously ship! ✨ 💅 🛳
