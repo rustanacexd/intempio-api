@@ -1,6 +1,0 @@
-Collecting raven
-  Downloading raven-6.6.0-py2.py3-none-any.whl (282kB)
-Installing collected packages: raven
-Successfully installed raven-6.6.0
-ok, added raven as:
-django-cors-headers==2.2.0raven==6.6.0

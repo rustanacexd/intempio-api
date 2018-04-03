@@ -1,7 +1,5 @@
 # intempio-api
 
-todo. Check out the project's [documentation](http://rustanacexd.github.io/intempio-api/).
-
 # Prerequisites
 
 - [Docker](https://docs.docker.com/docker-for-mac/install/)  
