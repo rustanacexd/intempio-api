@@ -15,6 +15,7 @@ from .sunovion_events.views import SunovionCreateEvent
 admin.site.site_header = 'Intempio'
 admin.site.site_title = 'Admin'
 admin.site.index_title = 'Events Administration'
+admin.site.site_url = None
 
 urlpatterns = [
     path('admin/', admin.site.urls),
