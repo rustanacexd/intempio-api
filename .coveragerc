@@ -1,0 +1,10 @@
+[run]
+branch = True
+omit = *migrations*,
+       *urls*,
+       *test*,
+       *admin*,
+       ./manage.py,
+       ./intempio_api/config/*,
+       ./intempio_api/wsgi.py,
+       *__init__*
