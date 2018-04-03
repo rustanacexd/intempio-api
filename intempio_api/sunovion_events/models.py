@@ -1,6 +1,5 @@
 import uuid
 
-from django.contrib.postgres.fields import JSONField
 from django.db import models
 from model_utils import Choices
 from model_utils.fields import MonitorField, StatusField
@@ -15,20 +14,24 @@ class SunovionEvent(TimeStampedModel):
     requestor_name = models.CharField(max_length=100)
     date = models.CharField(max_length=20)
     time = models.CharField(max_length=20)
-    period = models.CharField(max_length=10)
+    PERIOD = Choices('am', 'pm')
+    period = models.CharField(max_length=5, choices=PERIOD, default=PERIOD.am)
     duration = models.PositiveSmallIntegerField()
-    participants_count = models.PositiveSmallIntegerField()
-    presenters_count = models.PositiveSmallIntegerField()
+    participants_count = models.PositiveSmallIntegerField(blank=True, null=True)
+    presenters_count = models.PositiveSmallIntegerField(blank=True, null=True)
     producer_required = models.BooleanField(default=False)
     rehearsal_required = models.BooleanField(default=False)
     recording_required = models.BooleanField(default=False)
     technology_check = models.BooleanField(default=False)
     notes = models.TextField(blank=True)
-    presenters = JSONField()
+    presenters = models.TextField(blank=True)
     STATUS = Choices('new', 'reviewed', 'accepted')
     status = StatusField(default=STATUS.new)
-    reviewed_at = MonitorField(monitor='status', when=['reviewed'])
-    accepted_at = MonitorField(monitor='status', when=['accepted'])
+    reviewed_at = MonitorField(monitor='status', when=['reviewed'], default=None, null=True, blank=True)
+    accepted_at = MonitorField(monitor='status', when=['accepted'], default=None, null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.name} - {self.pk}'
 
     class Meta:
         ordering = ['-modified', '-created']
