@@ -30,3 +30,6 @@ class Production(Common):
     AWS_HEADERS = {
         'Cache-Control': 'max-age=86400, s-maxage=86400, must-revalidate',
     }
+
+    ROOT_URL = os.getenv('ROOT_URL', 'https://intempio-api-qa.herokuapp.com')
+    SEND_SLACK = True
