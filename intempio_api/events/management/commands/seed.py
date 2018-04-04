@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from intempio_api.sunovion_events.factories import SunovionEventFactory
+from intempio_api.events.factories import SunovionEventFactory
 
 
 class Command(BaseCommand):

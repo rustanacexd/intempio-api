@@ -2,7 +2,7 @@ from random import randint
 
 import factory
 
-from intempio_api.sunovion_events.models import SunovionEvent
+from intempio_api.events.models import SunovionEvent
 
 
 class SunovionEventFactory(factory.django.DjangoModelFactory):

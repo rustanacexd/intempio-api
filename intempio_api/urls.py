@@ -7,7 +7,7 @@ from django.contrib import admin
 # from rest_framework.routers import DefaultRouter
 # from rest_framework.authtoken import views
 # from .users.views import UserViewSet, UserCreateViewSet
-from .sunovion_events.views import SunovionCreateEvent, UpTimeView
+from .events.views import SunovionCreateEvent, UpTimeView, BiogenCreateEvent
 
 # router = DefaultRouter()
 # router.register(r'users', UserViewSet)
@@ -20,6 +20,7 @@ admin.site.site_url = None
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/sunovion-events', SunovionCreateEvent.as_view(), name='sunovion-event-create'),
+    path('api/v1/biogen-events', BiogenCreateEvent.as_view(), name='biogen-event-create'),
     path('ping', UpTimeView.as_view(), name='up_time')
     # path('api/v1/', include(router.urls)),
     # path('api-token-auth/', views.obtain_auth_token),

@@ -25,7 +25,7 @@ class Common(Configuration):
 
         # Your apps
         'intempio_api.users',
-        'intempio_api.sunovion_events'
+        'intempio_api.events'
 
     )
 
