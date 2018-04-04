@@ -35,3 +35,5 @@ class SunovionEvent(TimeStampedModel):
 
     class Meta:
         ordering = ['-modified', '-created']
+        verbose_name_plural = "Sunovion Events"
+        verbose_name = "Sunovion Event"
