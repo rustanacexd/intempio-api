@@ -63,7 +63,7 @@ class Common(Configuration):
 
     # General
     APPEND_SLASH = False
-    TIME_ZONE = 'UTC'
+    TIME_ZONE = 'US/Eastern'
     LANGUAGE_CODE = 'en-us'
     # If you set this to False, Django will make some optimizations so as not
     # to load the internationalization machinery.
