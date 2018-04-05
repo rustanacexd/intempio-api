@@ -57,7 +57,7 @@ class BiogenEvent(TimeStampedModel):
     eod_webcast = models.CharField(max_length=20, choices=EOD_WEBCAST)
     ms_sma = models.CharField(max_length=20, choices=MS_SMA)
     period = models.CharField(max_length=20, choices=PERIOD)
-    docs_link = models.CharField(max_length=255, blank=True)
+    slide_deck_name = models.CharField(max_length=255, blank=True)
     slide_deck_id = models.CharField(max_length=255, blank=True)
     client_event_code = models.CharField(max_length=255, blank=True)
     duration = models.PositiveSmallIntegerField()
