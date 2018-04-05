@@ -3,11 +3,15 @@ from .models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
+    fullname = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'first_name', 'last_name',)
-        read_only_fields = ('username', )
+        fields = ('id', 'username', 'role', 'fullname')
+        read_only_fields = ('username', 'role')
+
+    def get_fullname(self, obj):
+        return obj.get_full_name()
 
 
 class CreateUserSerializer(serializers.ModelSerializer):

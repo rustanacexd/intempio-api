@@ -25,4 +25,4 @@ class Local(Common):
     EMAIL_PORT = 1025
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
     ROOT_URL = 'http://localhost:8000'
-    SEND_SLACK = True
+    SEND_SLACK = False

@@ -1,3 +1,4 @@
+faker
 # Core
 pytz==2018.3
 Django==2.0.3
@@ -40,4 +41,5 @@ django-extensions==2.0.0
 django-cors-headers==2.2.0
 raven==6.6.0
 requests==2.18.4
-django-reversion==2.0.13
+django-prettyjson==0.3.3
+arrow==0.12.1

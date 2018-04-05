@@ -32,4 +32,4 @@ class Production(Common):
     }
 
     ROOT_URL = os.getenv('ROOT_URL', 'https://intempio-api-qa.herokuapp.com')
-    SEND_SLACK = True
+    SEND_SLACK = os.getenv('SEND_SLACK', True)

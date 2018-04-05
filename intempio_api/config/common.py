@@ -22,12 +22,11 @@ class Common(Configuration):
         'django_filters',  # for filtering rest endpoints
         'django_extensions',
         'corsheaders',
-        'reversion',
+        'prettyjson',
 
         # Your apps
         'intempio_api.users',
         'intempio_api.events'
-
     )
 
     # https://docs.djangoproject.com/en/2.0/topics/http/middleware/
@@ -90,7 +89,7 @@ class Common(Configuration):
     TEMPLATES = [
         {
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'DIRS': STATICFILES_DIRS,
+            'DIRS': [join(os.path.dirname(BASE_DIR), 'intempio_api/templates')],
             'APP_DIRS': True,
             'OPTIONS': {
                 'context_processors': [
@@ -190,18 +189,20 @@ class Common(Configuration):
     REST_FRAMEWORK = {
         'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
         'PAGE_SIZE': int(os.getenv('DJANGO_PAGINATION_LIMIT', 10)),
-        'DATETIME_FORMAT': '%Y-%m-%dT%H:%M:%S%z',
+        'DATETIME_FORMAT': '%Y-%m-%d',
         'DEFAULT_RENDERER_CLASSES': (
             'rest_framework.renderers.JSONRenderer',
-            # 'rest_framework.renderers.BrowsableAPIRenderer',
+            'rest_framework.renderers.BrowsableAPIRenderer',
         ),
         'DEFAULT_PERMISSION_CLASSES': [
-            'rest_framework.permissions.IsAuthenticated',
+            # 'rest_framework.permissions.IsAuthenticated',
+            'rest_framework.permissions.AllowAny',
         ],
         'DEFAULT_AUTHENTICATION_CLASSES': (
             'rest_framework.authentication.SessionAuthentication',
             'rest_framework.authentication.TokenAuthentication',
-        )
+        ),
+        'DEFAULT_METADATA_CLASS': None
     }
 
     CORS_ORIGIN_ALLOW_ALL = True
