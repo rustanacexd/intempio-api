@@ -22,6 +22,7 @@ class Common(Configuration):
         'django_filters',  # for filtering rest endpoints
         'django_extensions',
         'corsheaders',
+        'reversion',
 
         # Your apps
         'intempio_api.users',
