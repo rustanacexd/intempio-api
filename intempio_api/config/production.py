@@ -32,5 +32,5 @@ class Production(Common):
         'Cache-Control': 'max-age=86400, s-maxage=86400, must-revalidate',
     }
 
-    ADMIN_URL = os.getenv('ADMIN_URL', 'https://intempio-admin-staging.netlify.com ')
+    ADMIN_URL = os.getenv('ADMIN_URL', 'https://intempio-admin-staging.netlify.com')
     SEND_SLACK = True
