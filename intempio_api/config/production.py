@@ -1,4 +1,5 @@
 import os
+
 from .common import Common
 
 
@@ -31,5 +32,5 @@ class Production(Common):
         'Cache-Control': 'max-age=86400, s-maxage=86400, must-revalidate',
     }
 
-    ROOT_URL = os.getenv('ROOT_URL', 'https://intempio-api-qa.herokuapp.com')
-    SEND_SLACK = os.getenv('SEND_SLACK', True)
+    ADMIN_URL = os.getenv('ADMIN_URL', 'https://intempio-api-staging.herokuapp.com')
+    SEND_SLACK = False
