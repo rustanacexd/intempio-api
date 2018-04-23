@@ -1,6 +1,6 @@
 from django_filters import rest_framework as filters
 from rest_framework.filters import SearchFilter, OrderingFilter
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
@@ -25,6 +25,16 @@ class BiogenEventModelViewSet(ModelViewSet):
         instance = serializer.save()
         send_slack_notification(instance.pk, instance.name, 'biogen')
 
+    def get_permissions(self):
+        """
+        Instantiates and returns the list of permissions that this view requires.
+        """
+        if self.action == 'create':
+            permission_classes = [AllowAny]
+        else:
+            permission_classes = [IsAdminUser]
+        return [permission() for permission in permission_classes]
+
 
 class SunovionEventModelViewSet(ModelViewSet):
     queryset = SunovionEvent.objects.all().select_related('project')
@@ -40,6 +50,16 @@ class SunovionEventModelViewSet(ModelViewSet):
     def perform_create(self, serializer):
         instance = serializer.save()
         send_slack_notification(instance.pk, instance.name, 'sunovion')
+
+    def get_permissions(self):
+        """
+        Instantiates and returns the list of permissions that this view requires.
+        """
+        if self.action == 'create':
+            permission_classes = [AllowAny]
+        else:
+            permission_classes = [IsAdminUser]
+        return [permission() for permission in permission_classes]
 
 
 class ProjectModelViewSet(ModelViewSet):
