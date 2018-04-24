@@ -13,7 +13,7 @@ def send_slack_notification(event_id, event_name, channel):
             'resource_prefix': 'biogen-events'
         }
     }
-    if settings.SEND_SLACK:
+    if settings.ENVIRONMENT_NAME == 'PRODUCTION':
         base_url = settings.ADMIN_URL
         url = f'{base_url}/#/{channels[channel]["resource_prefix"]}/edit-event/{event_id}'
 
