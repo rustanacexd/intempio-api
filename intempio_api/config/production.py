@@ -33,4 +33,4 @@ class Production(Common):
     }
 
     ADMIN_URL = os.getenv('ADMIN_URL', 'https://intempio-admin-staging.netlify.com')
-    SEND_SLACK = True
+    SEND_SLACK = os.getenv('SEND_SLACK')
