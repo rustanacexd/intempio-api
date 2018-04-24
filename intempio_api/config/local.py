@@ -26,3 +26,4 @@ class Local(Common):
     EMAIL_PORT = 1025
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
     ADMIN_URL = os.getenv('ADMIN_URL', 'http://localhost:8000')
+    ENVIRONMENT_NAME = 'LOCAL'

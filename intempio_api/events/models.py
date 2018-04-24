@@ -1,11 +1,11 @@
 import uuid
 
+import arrow
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 from model_utils import Choices
 from model_utils.fields import MonitorField, StatusField
 from model_utils.models import TimeStampedModel
-import arrow
 
 
 class Project(TimeStampedModel):
@@ -113,6 +113,32 @@ class Event(TimeStampedModel):
 
         return output
 
+    @property
+    def prod_start(self):
+        return self.start_time.shift(hours=-1)
+
+    def submit_to_kissflow(self):
+        data = {
+            'LeadContact': self.requestor_name,
+            'ContactPhone': self.phone,
+            'ContactEmail': self.email,
+            'EventName': self.name,
+            'Duration': self.duration,
+            'ExpParticipants': self.participants_count,
+            'ExpPresenters': self.presenters_count,
+            'PresenterList': self.presenters_list,
+            'InternalNotes': self.notes,
+            'StartTime': self.start_time.to('US/Eastern').datetime,
+            'EndTime': self.end_time.to('US/Eastern').datetime,
+            'ProdHours': self.prod_hours,
+            'EventStatus': 'new',
+            'ProdStart': self.prod_start,
+            'ProjectCode': self.project.project_code
+        }
+
+        # rehearsal_required
+        return data
+
     def __str__(self):
         return f'{self.name} - {self.pk}'
 
@@ -127,6 +153,26 @@ class SunovionEvent(Event):
         ordering = ['-modified', '-created']
         verbose_name_plural = "Sunovion Events"
         verbose_name = "Sunovion Event"
+
+    @property
+    def site_address(self):
+        return 'Remote' if self.producer_required else ''
+
+    @property
+    def prod_start(self):
+        if self.producer_required:
+            return self.start_time.shift(hours=-2)
+        return self.start_time.shift(hours=-1)
+
+    def submit_to_kissflow(self):
+        data = super(SunovionEvent, self).submit_to_kissflow()
+        data['Onsite'] = self.producer_required
+        data['SiteAddress'] = self.site_address
+        data['rehearsal_required'] = self.rehearsal_required
+        data['recording_required'] = self.recording_required
+        data['technology_check'] = self.technology_check
+
+        return data
 
 
 class BiogenEvent(Event):
@@ -144,29 +190,11 @@ class BiogenEvent(Event):
         verbose_name = "Biogen Event"
 
     def submit_to_kissflow(self):
-        data = {
-            'LeadContact': self.requestor_name,
-            'ContactPhone': self.phone,
-            'ContactEmail': self.email,
-            'EventName': self.name,
-            'Duration': self.duration,
-            'ExpParticipants': self.participants_count,
-            'ExpPresenters': self.presenters_count,
-            'DocsLink': self.slide_deck_name,
-            'ClientEventCode': self.slide_deck_id,
-            'PresenterList': self.presenters_list,
-            'InternalNotes': self.notes,
-            'StartTime': self.start_time.to('US/Eastern').datetime,
-            'EndTime': self.end_time.to('US/Eastern').datetime,
-            'ProdHours': self.prod_hours,
-            'EventStatus': 'new'
-        }
+        data = super(BiogenEvent, self).submit_to_kissflow()
+        data['DocsLink'] = self.slide_deck_name
+        data['ClientEventCode'] = self.slide_deck_id
 
-        # StartTime
-        # EndTime
-        # ProdStart
         # MS / SMA
         # EOD / Webcast
-        # Program Meeting ID
 
         return data
