@@ -1,12 +1,13 @@
 from django_filters import rest_framework as filters
 from rest_framework.filters import SearchFilter, OrderingFilter
-from rest_framework.permissions import AllowAny, IsAdminUser
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
 from intempio_api.events.helper import send_slack_notification
 from intempio_api.events.models import BiogenEvent, SunovionEvent, Project
+from intempio_api.events.permissions import IsAdminOrReadOnly
 from intempio_api.events.serializers import SunovionEventSerializer, BiogenEventSerializer, ProjectSerializer
 
 
@@ -20,20 +21,11 @@ class BiogenEventModelViewSet(ModelViewSet):
 
     search_fields = ('id', 'name', 'email', 'phone', 'requestor_name', 'project__project_code',)
     ordering_fields = ('created', 'modified', 'reviewed_at', 'accepted_at')
+    permission_classes = (IsAdminOrReadOnly,)
 
     def perform_create(self, serializer):
         instance = serializer.save()
         send_slack_notification(instance.pk, instance.name, 'biogen')
-
-    def get_permissions(self):
-        """
-        Instantiates and returns the list of permissions that this view requires.
-        """
-        if self.action == 'create':
-            permission_classes = [AllowAny]
-        else:
-            permission_classes = [IsAdminUser]
-        return [permission() for permission in permission_classes]
 
 
 class SunovionEventModelViewSet(ModelViewSet):
@@ -46,20 +38,11 @@ class SunovionEventModelViewSet(ModelViewSet):
 
     search_fields = ('id', 'name', 'email', 'phone', 'requestor_name', 'project__project_code')
     ordering_fields = ('created', 'modified', 'reviewed_at', 'accepted_at')
+    permission_classes = (IsAdminOrReadOnly,)
 
     def perform_create(self, serializer):
         instance = serializer.save()
         send_slack_notification(instance.pk, instance.name, 'sunovion')
-
-    def get_permissions(self):
-        """
-        Instantiates and returns the list of permissions that this view requires.
-        """
-        if self.action == 'create':
-            permission_classes = [AllowAny]
-        else:
-            permission_classes = [IsAdminUser]
-        return [permission() for permission in permission_classes]
 
 
 class ProjectModelViewSet(ModelViewSet):
