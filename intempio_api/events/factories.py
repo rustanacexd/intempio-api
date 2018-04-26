@@ -1,15 +1,17 @@
+import json
 from random import randint
 
 import factory
-import json
 from faker import Faker
+
 from intempio_api.events.models import SunovionEvent, BiogenEvent, Project
 
 fake = Faker()
 
 
 class ProjectFactory(factory.django.DjangoModelFactory):
-    project_code = factory.Iterator(Project.PROJECT_CODE, getter=lambda c: c[0])
+    project_code = factory.Sequence(lambda n: f'2018.00{n} - Dummy Project Code {n}')
+    project_id = factory.Sequence(lambda n: f'2017.02{n}')
     client = factory.Iterator(Project.CLIENT, getter=lambda c: c[0])
     fulfilled_by = factory.Iterator(Project.INTERNAL_CLIENT, getter=lambda c: c[0])
     sow_status = factory.Iterator(Project.SOW_STATUS, getter=lambda c: c[0])
@@ -28,7 +30,7 @@ class ProjectFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = Project
-        django_get_or_create = ('project_code',)
+        django_get_or_create = ('project_id',)
 
 
 class SunovionEventFactory(factory.django.DjangoModelFactory):

@@ -13,36 +13,10 @@ class Project(TimeStampedModel):
     INTERNAL_CLIENT = Choices('Intempio', 'RVibe')
     SOW_STATUS = Choices('Client', 'Signed')
     INVITE_TYPE = Choices('single', 'recurring')
-    PROJECT_CODE = Choices(
-        ('2018-001-Nov', '2018.001 Nov - Legal 2018 Support'),
-        ('2018-002-Bio', '2018.002 Bio - EOD HCP and SMA PEP Programs'),
-        ('2018-003-Nov', '2018.003 Nov PLS 1st'),
-        ('2018-005-Ver', '2018.005 Ver - VAKO 2018'),
-        ('2018-007-Nov', '2018.007 Nov - Post ENETS 2018'),
-        ('2018-008-Sun', '2018.008 Sun - Training Studio Session Support'),
-        ('2018-008-01-Sun', '2018.008.01 Sun - Sainz January Fast Start'),
-        ('2018-008-02-Sun', '2018.008.02 Sun - January New Hire Training'),
-        ('2018-008-03-Sun', '2018.008.03 Sun - The Hospital Expert'),
-        ('2018-008-04', '2018.008.04 Studio Maintenance'),
-        ('2018-008-05-Sun', '2018.008.05 Sun - April New Hire Phase II'),
-        ('2018-009-Nov', '2018.009 Nov - Onc VA Reimagining Access Meeting'),
-        ('2018-011-Nov', '2018.011 Nov - Onc IDAPS Meeting'),
-        ('2018-012-Nov', '2018.012 Nov - PLS IDAPS'),
-        ('2018-013-Nov', '2018.013 Nov - Onc MA IDAPS'),
-        ('2018-014-Nov', '2018.014 Nov - MMS Support Plan'),
-        ('2018-015-Nov', '2018.015 Nov - Onc Franchise Head Sessions'),
-        ('2018-016-Bio', '2018.016 Bio - WW Medical Speaker Meetings'),
-        ('2018-018-Nov', '2018.018 Nov - Onc International Broadcast'),
-        ('2018-019-Bio', '2018.019 Bio - FFT Training'),
-        ('2018-020-Ver', '2018.020 Ver - Multi event contract'),
-        ('2018-021-Nov', '2018.021 Nov - Additional Legal Support'),
-        ('2018-022-Bio', '2018.022 Bio - Marketing Sessions'),
-        ('2018-023-Bio', '2018.023 Bio - MS Patient Webinars'),
-        ('2018-024-Nov', '2018.024 Nov - Segmented Marketing'),
-        ('2018-025-GE', '2018.025 GE - NPI August')
-    )
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    project_code = models.CharField(max_length=255, choices=PROJECT_CODE, unique=True)
+    project_id = models.CharField(max_length=255)
+    project_code = models.CharField(max_length=255)
     client = models.CharField(max_length=100, choices=CLIENT, blank=True)
     fulfilled_by = models.CharField(max_length=100, choices=INTERNAL_CLIENT, blank=True)
     sow_status = models.CharField(max_length=100, choices=SOW_STATUS, blank=True)
@@ -131,9 +105,10 @@ class Event(TimeStampedModel):
             'StartTime': self.start_time.to('US/Eastern').datetime,
             'EndTime': self.end_time.to('US/Eastern').datetime,
             'ProdHours': self.prod_hours,
-            'EventStatus': 'new',
+            'EventStatus': 'new',  # TODO ASK PARKER:
             'ProdStart': self.prod_start,
-            'ProjectCode': self.project.project_code
+            'ProjectCode': self.project.project_code,
+            'Client': self.project.client
         }
 
         # rehearsal_required

@@ -6,7 +6,7 @@ from intempio_api.events.models import SunovionEvent, BiogenEvent, Project
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
-        fields = ('id', 'project_code', 'client', 'fulfilled_by', 'sow_status',
+        fields = ('id', 'project_id', 'project_code', 'client', 'fulfilled_by', 'sow_status',
                   'invoice_sheet', 'invite_sent_by', 'invite_type', 'run_sheet',
                   'reporting', 'notes', 'contacts', 'created', 'modified')
 

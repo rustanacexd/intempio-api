@@ -1,9 +1,11 @@
 from django_filters import rest_framework as filters
+from rest_framework import mixins
+from rest_framework.decorators import list_route
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
 from intempio_api.events.helper import send_slack_notification
 from intempio_api.events.models import BiogenEvent, SunovionEvent, Project
@@ -67,10 +69,24 @@ class SunovionEventModelViewSet(ModelViewSet):
 class ProjectModelViewSet(ModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
-    filter_backends = (SearchFilter, OrderingFilter)
-    lookup_field = 'project_code'
-    search_fields = ('id', 'project_code')
+    filter_backends = (filters.DjangoFilterBackend, SearchFilter, OrderingFilter)
+    filter_fields = ('project_id', 'project_code')
+    search_fields = ('id', 'project_id', 'project_code')
     ordering_fields = ('created', 'modified')
+
+    @list_route()
+    def project_codes(self, request):
+        client_name = request.query_params.get('client')
+        project_codes = Project.objects.filter(client=client_name).values_list('project_code', flat=True)
+        return Response(project_codes)
+
+
+class FindByProjectId(mixins.RetrieveModelMixin, GenericViewSet):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    lookup_field = 'project_code'
+    # lookup_value_regex = '[\w.@+-]+'
+    lookup_value_regex = '(.+)'
 
 
 class UpTimeView(APIView):

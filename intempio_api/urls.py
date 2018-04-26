@@ -9,7 +9,7 @@ from rest_framework.routers import DefaultRouter
 
 from .events.views import (
     UpTimeView, BiogenEventModelViewSet, SunovionEventModelViewSet,
-    ProjectModelViewSet)
+    ProjectModelViewSet, FindByProjectId)
 from .users.views import UserViewSet
 
 router = DefaultRouter()
@@ -18,6 +18,8 @@ router.register(r'users', UserViewSet)
 router.register(r'biogen-events', BiogenEventModelViewSet)
 router.register(r'sunovion-events', SunovionEventModelViewSet)
 router.register(r'projects', ProjectModelViewSet)
+router.register(r'project', FindByProjectId)
+
 
 admin.site.site_header = 'Intempio'
 admin.site.site_title = 'Admin'
