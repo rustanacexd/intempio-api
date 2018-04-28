@@ -1,14 +1,16 @@
 from rest_framework import serializers
+
 from .models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
     fullname = serializers.SerializerMethodField()
+    roles = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'role', 'fullname')
-        read_only_fields = ('username', 'role')
+        fields = ('id', 'username', 'roles', 'fullname')
+        read_only_fields = ('username', 'roles')
 
     def get_fullname(self, obj):
         return obj.get_full_name()
