@@ -23,6 +23,7 @@ class Common(Configuration):
         'django_filters',  # for filtering rest endpoints
         'django_extensions',
         'corsheaders',
+        'debug_toolbar',
         'prettyjson',
 
         # Your apps
@@ -32,6 +33,7 @@ class Common(Configuration):
 
     # https://docs.djangoproject.com/en/2.0/topics/http/middleware/
     MIDDLEWARE = (
+        'debug_toolbar.middleware.DebugToolbarMiddleware',
         'django.middleware.security.SecurityMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
         'corsheaders.middleware.CorsMiddleware',
@@ -207,3 +209,4 @@ class Common(Configuration):
     }
 
     CORS_ORIGIN_ALLOW_ALL = True
+    INTERNAL_IPS = '127.0.0.1'

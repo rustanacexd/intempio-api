@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.conf.urls import url
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
@@ -20,7 +21,6 @@ router.register(r'sunovion-events', SunovionEventModelViewSet)
 router.register(r'projects', ProjectModelViewSet)
 router.register(r'project', FindByProjectId)
 
-
 admin.site.site_header = 'Intempio'
 admin.site.site_title = 'Admin'
 admin.site.index_title = 'Events Administration'
@@ -38,3 +38,10 @@ urlpatterns = [
                   re_path(r'^$', RedirectView.as_view(url=reverse_lazy('api-root'), permanent=False)),
               ] \
               + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+if settings.DEBUG:
+    import debug_toolbar
+
+    urlpatterns = [
+                      url(r'^__debug__/', include(debug_toolbar.urls)),
+                  ] + urlpatterns
