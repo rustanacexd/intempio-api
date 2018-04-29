@@ -1,3 +1,4 @@
+import logging
 import os
 
 from .common import Common
@@ -10,7 +11,9 @@ class Local(Common):
 
     # Testing
     INSTALLED_APPS = Common.INSTALLED_APPS
-    INSTALLED_APPS += ('django_nose',)
+    INSTALLED_APPS += ('django_nose', 'nplusone.ext.django')
+    MIDDLEWARE = Common.MIDDLEWARE
+    MIDDLEWARE += ('nplusone.ext.django.NPlusOneMiddleware',)
     TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
     NOSE_ARGS = [
         BASE_DIR,
@@ -27,3 +30,5 @@ class Local(Common):
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
     ADMIN_URL = os.getenv('ADMIN_URL', 'http://localhost:8000')
     ENVIRONMENT_NAME = 'LOCAL'
+    NPLUSONE_LOGGER = logging.getLogger('nplusone')
+    NPLUSONE_LOG_LEVEL = logging.WARN

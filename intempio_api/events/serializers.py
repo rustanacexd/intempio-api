@@ -12,38 +12,48 @@ class ProjectSerializer(serializers.ModelSerializer):
 
 
 class SunovionEventSerializer(serializers.ModelSerializer):
-    project_code = serializers.SerializerMethodField(read_only=True)
-
     class Meta:
         model = SunovionEvent
         fields = ('id', 'name', 'email', 'phone', 'requestor_name', 'date', 'time', 'period',
                   'duration', 'participants_count', 'presenters_count', 'producer_required',
                   'rehearsal_required', 'recording_required', 'technology_check', 'notes',
-                  'presenters', 'timezone', 'status', 'project', 'project_code',
-                  'reviewed_at', 'accepted_at', 'created', 'modified')
+                  'presenters', 'timezone', 'status', 'project', 'reviewed_at', 'accepted_at',
+                  'created', 'modified')
 
         read_only_fields = ('reviewed_at', 'accepted_at')
 
-    def get_project_code(self, obj):
-        if obj.project:
-            return obj.project.project_code
-        return None
-
 
 class BiogenEventSerializer(serializers.ModelSerializer):
-    project_code = serializers.SerializerMethodField(read_only=True)
-
     class Meta:
         model = BiogenEvent
         fields = ('id', 'name', 'email', 'phone', 'requestor_name', 'date', 'time', 'eod_webcast',
                   'ms_sma', 'period', 'slide_deck_name', 'slide_deck_id', 'program_meeting_id',
                   'duration', 'timezone', 'participants_count', 'presenters_count', 'notes',
-                  'presenters', 'status', 'project', 'project_code', 'reviewed_at', 'accepted_at',
+                  'presenters', 'status', 'project', 'reviewed_at', 'accepted_at',
                   'created', 'modified')
 
         read_only_fields = ('reviewed_at', 'accepted_at')
 
+
+class HistoricalBiogenEventSerializer(serializers.ModelSerializer):
+    history_user = serializers.StringRelatedField()
+    project_code = serializers.SerializerMethodField()
+
+    class Meta:
+        model = BiogenEvent.history.model
+        fields = '__all__'
+
     def get_project_code(self, obj):
-        if obj.project:
-            return obj.project.project_code
-        return None
+        return obj.project.project_code if obj.project else None
+
+
+class HistoricalSunovionEventSerializer(serializers.ModelSerializer):
+    history_user = serializers.StringRelatedField()
+    project_code = serializers.SerializerMethodField()
+
+    class Meta:
+        model = SunovionEvent.history.model
+        fields = '__all__'
+
+    def get_project_code(self, obj):
+        return obj.project.project_code if obj.project else None

@@ -25,6 +25,7 @@ class Common(Configuration):
         'corsheaders',
         'debug_toolbar',
         'prettyjson',
+        'simple_history',
 
         # Your apps
         'intempio_api.users',
@@ -42,6 +43,7 @@ class Common(Configuration):
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
+        'simple_history.middleware.HistoryRequestMiddleware'
     )
 
     ALLOWED_HOSTS = ["*"]
@@ -182,6 +184,10 @@ class Common(Configuration):
                 'handlers': ['console'],
                 'level': 'INFO'
             },
+            'nplusone': {
+                'handlers': ['console'],
+                'level': 'WARN',
+            },
         }
     }
 
@@ -191,7 +197,7 @@ class Common(Configuration):
     # Django Rest Framework
     REST_FRAMEWORK = {
         'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-        'PAGE_SIZE': int(os.getenv('DJANGO_PAGINATION_LIMIT', 20)),
+        'PAGE_SIZE': int(os.getenv('DJANGO_PAGINATION_LIMIT', 10)),
         'DATETIME_FORMAT': '%Y-%m-%d',
         'DEFAULT_RENDERER_CLASSES': (
             'rest_framework.renderers.JSONRenderer',

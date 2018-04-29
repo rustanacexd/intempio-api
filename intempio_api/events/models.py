@@ -6,6 +6,11 @@ from django.db import models
 from model_utils import Choices
 from model_utils.fields import MonitorField, StatusField
 from model_utils.models import TimeStampedModel
+from simple_history.models import HistoricalRecords
+
+
+class StatusMixin(object):
+    STATUS = Choices('new', 'reviewed', 'accepted')
 
 
 class Project(TimeStampedModel):
@@ -35,7 +40,7 @@ class Project(TimeStampedModel):
         return f'{self.project_code} - {self.pk}'
 
 
-class Event(TimeStampedModel):
+class Event(StatusMixin, TimeStampedModel):
     PERIOD = Choices('am', 'pm')
     STATUS = Choices('new', 'reviewed', 'accepted')
     TIMEZONE = Choices('US/Central', 'US/Eastern', 'US/Mountain', 'US/Pacific')
@@ -54,7 +59,7 @@ class Event(TimeStampedModel):
     timezone = models.CharField(max_length=20, choices=TIMEZONE, default=TIMEZONE['US/Eastern'])
     notes = models.TextField(blank=True)
     presenters = JSONField(blank=True, null=True)
-    status = StatusField(default=STATUS.new)
+    status = StatusField(default=STATUS.new, choices_name='STATUS')
     reviewed_at = MonitorField(monitor='status', when=['reviewed'], default=None, null=True, blank=True)
     accepted_at = MonitorField(monitor='status', when=['accepted'], default=None, null=True, blank=True)
     project = models.ForeignKey(Project, on_delete=models.SET_NULL, blank=True, null=True)
@@ -123,6 +128,7 @@ class SunovionEvent(Event):
     rehearsal_required = models.BooleanField(default=False)
     recording_required = models.BooleanField(default=False)
     technology_check = models.BooleanField(default=False)
+    history = HistoricalRecords(bases=[StatusMixin, models.Model])
 
     class Meta:
         ordering = ['-modified', '-created']
@@ -158,6 +164,7 @@ class BiogenEvent(Event):
     slide_deck_name = models.CharField(max_length=255, blank=True)
     slide_deck_id = models.CharField(max_length=255, blank=True)
     program_meeting_id = models.CharField(max_length=255, blank=True)
+    history = HistoricalRecords(bases=[StatusMixin, models.Model])
 
     class Meta:
         ordering = ['-modified', '-created']
