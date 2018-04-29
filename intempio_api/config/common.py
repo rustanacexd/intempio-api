@@ -210,3 +210,5 @@ class Common(Configuration):
 
     CORS_ORIGIN_ALLOW_ALL = True
     INTERNAL_IPS = '127.0.0.1'
+    KISSFLOW_API_KEY = os.getenv('KISSFLOW_API_KEY')
+    KISSFLOW_EMAIL_ID = os.getenv('KISSFLOW_EMAIL_ID')
