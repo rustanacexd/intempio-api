@@ -10,7 +10,7 @@ from simple_history.models import HistoricalRecords
 
 
 class StatusMixin(object):
-    STATUS = Choices('new', 'reviewed', 'accepted')
+    STATUS = Choices('new', 'reviewed', 'accepted', 'canceled')
 
 
 class Project(TimeStampedModel):
@@ -42,7 +42,6 @@ class Project(TimeStampedModel):
 
 class Event(StatusMixin, TimeStampedModel):
     PERIOD = Choices('am', 'pm')
-    STATUS = Choices('new', 'reviewed', 'accepted')
     TIMEZONE = Choices('US/Central', 'US/Eastern', 'US/Mountain', 'US/Pacific')
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -59,7 +58,7 @@ class Event(StatusMixin, TimeStampedModel):
     timezone = models.CharField(max_length=20, choices=TIMEZONE, default=TIMEZONE['US/Eastern'])
     notes = models.TextField(blank=True)
     presenters = JSONField(blank=True, null=True)
-    status = StatusField(default=STATUS.new, choices_name='STATUS')
+    status = StatusField(default=StatusMixin.STATUS.new, choices_name='STATUS')
     reviewed_at = MonitorField(monitor='status', when=['reviewed'], default=None, null=True, blank=True)
     accepted_at = MonitorField(monitor='status', when=['accepted'], default=None, null=True, blank=True)
     project = models.ForeignKey(Project, on_delete=models.SET_NULL, blank=True, null=True)
