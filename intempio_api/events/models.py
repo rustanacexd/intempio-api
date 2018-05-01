@@ -75,8 +75,12 @@ class Event(StatusMixin, TimeStampedModel):
 
     @property
     def start_time(self):
-        arrow_obj = arrow.get(f'{self.date} {self.time}', 'YYYY-MM-DD h:m', tzinfo=self.timezone)
+        arrow_obj = arrow.get(f'{self.date} {self.time}', 'YYYY-MM-DD hh:mm', tzinfo=self.timezone)
         return arrow_obj
+
+    @property
+    def start_time_est_formatted(self):
+        return self.start_time.to('US/Eastern').format('YYYY-MM-DD hh:mm')
 
     @property
     def end_time(self):
