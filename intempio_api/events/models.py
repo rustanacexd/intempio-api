@@ -59,6 +59,10 @@ class Event(StatusMixin, TimeStampedModel):
     notes = models.TextField(blank=True)
     presenters = JSONField(blank=True, null=True)
     status = StatusField(default=StatusMixin.STATUS.new, choices_name='STATUS')
+    producer_required = models.BooleanField(default=False)
+    rehearsal_required = models.BooleanField(default=False)
+    recording_required = models.BooleanField(default=False)
+    technology_check = models.BooleanField(default=False)
     reviewed_at = MonitorField(monitor='status', when=['reviewed'], default=None, null=True, blank=True)
     accepted_at = MonitorField(monitor='status', when=['accepted'], default=None, null=True, blank=True)
     project = models.ForeignKey(Project, on_delete=models.SET_NULL, blank=True, null=True)
@@ -88,6 +92,9 @@ class Event(StatusMixin, TimeStampedModel):
     @property
     def presenters_list(self):
         output = ''
+        if not self.presenters:
+            return output
+
         for presenter in self.presenters:
             name = presenter.get('name', '')
             email = presenter.get('email', '')
@@ -97,7 +104,11 @@ class Event(StatusMixin, TimeStampedModel):
 
     @property
     def prod_start(self):
-        return self.start_time.shift(hours=-1)
+        return self.start_time.shift(hours=-1).datetime
+
+    @property
+    def site_address(self):
+        return 'Remote' if self.producer_required else ''
 
     def submit_to_kissflow(self):
         data = {
@@ -109,17 +120,25 @@ class Event(StatusMixin, TimeStampedModel):
             'ExpParticipants': self.participants_count,
             'ExpPresenters': self.presenters_count,
             'PresenterList': self.presenters_list,
-            'InternalNotes': self.notes,
+            'ClientNotes': self.notes,
             'StartTime': self.start_time.to('US/Eastern').datetime,
             'EndTime': self.end_time.to('US/Eastern').datetime,
             'ProdHours': self.prod_hours,
-            'EventStatus': 'new',  # TODO ASK PARKER:
+            'EventStatus': 'new',
             'ProdStart': self.prod_start,
             'ProjectCode': self.project.project_code,
-            'Client': self.project.client
+            'Client': self.project.client,
+            'Onsite': self.producer_required,
+            'SiteAddress': self.site_address,  # TODO ALLOW NEW ADDRESS, ASK PARKER PRECAUTION OF ADDRESS
+            'RecordReqs': self.recording_required,
+            'DocsLink': '',
+            'ClientEventCode': '',
+            'rehearsal_required': self.rehearsal_required,
+            'recording_required': self.recording_required,
+            'technology_check': self.technology_check,
         }
 
-        # rehearsal_required
+        # ProducersReq # TODO
         return data
 
     def __str__(self):
@@ -127,10 +146,6 @@ class Event(StatusMixin, TimeStampedModel):
 
 
 class SunovionEvent(Event):
-    producer_required = models.BooleanField(default=False)
-    rehearsal_required = models.BooleanField(default=False)
-    recording_required = models.BooleanField(default=False)
-    technology_check = models.BooleanField(default=False)
     history = HistoricalRecords(bases=[StatusMixin, models.Model])
 
     class Meta:
@@ -139,31 +154,17 @@ class SunovionEvent(Event):
         verbose_name = "Sunovion Event"
 
     @property
-    def site_address(self):
-        return 'Remote' if self.producer_required else ''
-
-    @property
     def prod_start(self):
         if self.producer_required:
             return self.start_time.shift(hours=-2)
         return self.start_time.shift(hours=-1)
 
-    def submit_to_kissflow(self):
-        data = super(SunovionEvent, self).submit_to_kissflow()
-        data['Onsite'] = self.producer_required
-        data['SiteAddress'] = self.site_address
-        data['rehearsal_required'] = self.rehearsal_required
-        data['recording_required'] = self.recording_required
-        data['technology_check'] = self.technology_check
-
-        return data
-
 
 class BiogenEvent(Event):
     EOD_WEBCAST = Choices('EOD', 'Webcast')
     MS_SMA = Choices('MS', 'MSA')
-    eod_webcast = models.CharField(max_length=20, choices=EOD_WEBCAST)
-    ms_sma = models.CharField(max_length=20, choices=MS_SMA)
+    eod_webcast = models.CharField(max_length=20, choices=EOD_WEBCAST, blank=True)
+    ms_sma = models.CharField(max_length=20, choices=MS_SMA, blank=True)
     slide_deck_name = models.CharField(max_length=255, blank=True)
     slide_deck_id = models.CharField(max_length=255, blank=True)
     program_meeting_id = models.CharField(max_length=255, blank=True)

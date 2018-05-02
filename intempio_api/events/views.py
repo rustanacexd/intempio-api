@@ -44,8 +44,7 @@ class BiogenEventModelViewSet(ModelViewSet):
 
     @detail_route(filter_backends=[])
     def history(self, request, pk=None):
-        event = BiogenEvent.objects.get(pk=pk)
-        history = event.history.all().select_related('history_user', 'project')
+        history = self.get_object().history.all().select_related('history_user', 'project')
         page = self.paginate_queryset(history)
 
         if page is not None:
@@ -58,15 +57,18 @@ class BiogenEventModelViewSet(ModelViewSet):
     @detail_route(methods=['POST'])
     def revert(self, request, pk=None):
         history_id = request.data.get('history_id')
-        event = BiogenEvent.objects.get(pk=pk)
-
         try:
-            history = event.history.get(history_id=history_id).instance.save()
+            history = self.get_object().history.get(history_id=history_id).instance.save()
         except BiogenEvent.history.model.DoesNotExist:
             raise NotFound()
 
         serializer = HistoricalBiogenEventSerializer(history)
         return Response(serializer.data)
+
+    @detail_route(methods=['GET'])
+    def submit_to_kissflow(self, request, pk=None):
+        data = self.get_object().submit_to_kissflow()
+        return Response(data)
 
 
 class SunovionEventModelViewSet(ModelViewSet):
@@ -97,9 +99,7 @@ class SunovionEventModelViewSet(ModelViewSet):
 
     @detail_route(filter_backends=[])
     def history(self, request, pk=None):
-        event = SunovionEvent.objects.get(pk=pk)
-        history = event.history.all().select_related('history_user', 'project')
-
+        history = self.get_object().history.all().select_related('history_user', 'project')
         page = self.paginate_queryset(history)
 
         if page is not None:
@@ -112,10 +112,9 @@ class SunovionEventModelViewSet(ModelViewSet):
     @detail_route(methods=['POST'])
     def revert(self, request, pk=None):
         history_id = request.data.get('history_id')
-        event = SunovionEvent.objects.get(pk=pk)
 
         try:
-            history = event.history.get(history_id=history_id).instance.save()
+            history = self.get_object().history.get(history_id=history_id).instance.save()
         except SunovionEvent.history.model.DoesNotExist:
             raise NotFound()
 
