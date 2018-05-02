@@ -155,11 +155,10 @@ class Event(StatusMixin, TimeStampedModel):
             # 'Customer': self.project.client,
             'Is_this_Event_Onsite': int(self.producer_required),
             'Onsite_Event_Address': self.site_address,  # TODO ALLOW NEW ADDRESS, ASK PARKER PRECAUTION OF ADDRESS
-            'EventDocsLink': '',
-            'ClientEventCode': '',
+            # 'EventDocsLink': '',
             'Client_Needs_Recording': int(self.recording_required),
             'Internal_Notes': self.project.notes,
-            'Internal_Company': self.project.client
+            'Internal_Company': self.project.invite_sent_by
         }
 
         # ProducersReq # TODO
@@ -201,12 +200,9 @@ class BiogenEvent(Event):
         verbose_name_plural = "Biogen Events"
         verbose_name = "Biogen Event"
 
-    def submit_to_kissflow(self):
-        data = super(BiogenEvent, self).to_kissflow()
-        data['EventDocsLink'] = self.slide_deck_name
-        data['ClientEventCode'] = self.slide_deck_id
+    def to_kissflow(self):
+        data = super().to_kissflow()
+        data['ClientEventCode']: self.program_meeting_id
 
-        # MS / SMA
-        # EOD / Webcast
-
+        response = submit_to_kissflow(data)
         return data
