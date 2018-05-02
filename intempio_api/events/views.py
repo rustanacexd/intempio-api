@@ -65,9 +65,9 @@ class BiogenEventModelViewSet(ModelViewSet):
         serializer = HistoricalBiogenEventSerializer(history)
         return Response(serializer.data)
 
-    @detail_route(methods=['GET'])
+    @detail_route(methods=['GET', 'POST'])
     def submit_to_kissflow(self, request, pk=None):
-        data = self.get_object().submit_to_kissflow()
+        data = self.get_object().to_kissflow()
         return Response(data)
 
 
@@ -120,6 +120,11 @@ class SunovionEventModelViewSet(ModelViewSet):
 
         serializer = HistoricalSunovionEventSerializer(history)
         return Response(serializer.data)
+
+    @detail_route(methods=['GET', 'POST'])
+    def submit_to_kissflow(self, request, pk=None):
+        data = self.get_object().to_kissflow()
+        return Response(data)
 
 
 class ProjectModelViewSet(ModelViewSet):

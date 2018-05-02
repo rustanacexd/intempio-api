@@ -1,5 +1,6 @@
 import requests
 from django.conf import settings
+from rest_framework.exceptions import ValidationError
 
 
 def send_slack_notification(event_id, event_name, channel):
@@ -26,10 +27,16 @@ def send_slack_notification(event_id, event_name, channel):
 
 
 def submit_to_kissflow(data):
-    r = requests.post(
-        'https://kf-0002208.appspot.com/api/1//Event Creation/submit',
-        json=data,
-        headers={
-            'api_key': settings.KISSFLOW_API_KEY,
-            'email_id': settings.KISSFLOW_EMAIL_ID
-        })
+    try:
+        r = requests.post(
+            'https://kf-0002208.appspot.com/api/1/Event Creation/submit',
+            json=data,
+            headers={
+                'api_key': settings.KISSFLOW_API_KEY,
+                'email_id': settings.KISSFLOW_EMAIL_ID
+            })
+        r.raise_for_status()
+    except requests.exceptions.HTTPError:
+        raise ValidationError(r.json())
+
+    return r.json()

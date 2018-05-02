@@ -8,6 +8,10 @@ from model_utils.fields import MonitorField, StatusField
 from model_utils.models import TimeStampedModel
 from simple_history.models import HistoricalRecords
 
+from intempio_api.events.helper import submit_to_kissflow
+
+TO_KF_DATE_TIME_FORMAT = 'YYYY-MM-DD HH:MM'
+
 
 class StatusMixin(object):
     STATUS = Choices('new', 'reviewed', 'accepted', 'canceled')
@@ -82,12 +86,36 @@ class Event(StatusMixin, TimeStampedModel):
         return arrow_obj
 
     @property
+    def start_time_est(self):
+        return self.start_time.to('US/Eastern')
+
+    @property
     def start_time_est_formatted(self):
-        return self.start_time.to('US/Eastern').format('YYYY-MM-DD hh:mm')
+        return self.start_time_est.format(TO_KF_DATE_TIME_FORMAT)
 
     @property
     def end_time(self):
         return self.start_time.shift(minutes=+self.duration)
+
+    @property
+    def end_time_est(self):
+        return self.start_time.to('US/Eastern')
+
+    @property
+    def end_time_est_formatted(self):
+        return self.end_time_est.format(TO_KF_DATE_TIME_FORMAT)
+
+    @property
+    def prod_start(self):
+        return self.start_time.shift(hours=-1)
+
+    @property
+    def prod_start_est(self):
+        return self.prod_start.to('US/Eastern')
+
+    @property
+    def prod_start_est_formatted(self):
+        return self.prod_start_est.format(TO_KF_DATE_TIME_FORMAT)
 
     @property
     def presenters_list(self):
@@ -103,14 +131,10 @@ class Event(StatusMixin, TimeStampedModel):
         return output
 
     @property
-    def prod_start(self):
-        return self.start_time.shift(hours=-1).datetime
-
-    @property
     def site_address(self):
         return 'Remote' if self.producer_required else ''
 
-    def submit_to_kissflow(self):
+    def to_kissflow(self):
         data = {
             'LeadContact': self.requestor_name,
             'ContactPhone': self.phone,
@@ -118,27 +142,29 @@ class Event(StatusMixin, TimeStampedModel):
             'EventName': self.name,
             'Duration': self.duration,
             'ExpParticipants': self.participants_count,
-            'ExpPresenters': self.presenters_count,
-            'PresenterList': self.presenters_list,
-            'ClientNotes': self.notes,
-            'StartTime': self.start_time.to('US/Eastern').datetime,
-            'EndTime': self.end_time.to('US/Eastern').datetime,
+            'ExpectedPresenters': self.presenters_count,
+            'PresentersList': self.presenters_list,
+            'Client_Notes': self.notes,
             'ProdHours': self.prod_hours,
-            'EventStatus': 'new',
-            'ProdStart': self.prod_start,
-            'ProjectCode': self.project.project_code,
-            'Client': self.project.client,
-            'Onsite': self.producer_required,
-            'SiteAddress': self.site_address,  # TODO ALLOW NEW ADDRESS, ASK PARKER PRECAUTION OF ADDRESS
-            'RecordReqs': self.recording_required,
-            'DocsLink': '',
+            'New_Event_Type': 'new',  # TODO
+            'StartEastern': self.start_time_est_formatted,
+            'ProdStartEastern': self.prod_start_est_formatted,
+            'EndTime': self.end_time_est_formatted,
+            # 'Project_Code': self.project.project_code,
+            # 'Project_ID': self.project.project_id,
+            # 'Customer': self.project.client,
+            'Is_this_Event_Onsite': int(self.producer_required),
+            'Onsite_Event_Address': self.site_address,  # TODO ALLOW NEW ADDRESS, ASK PARKER PRECAUTION OF ADDRESS
+            'EventDocsLink': '',
             'ClientEventCode': '',
-            'rehearsal_required': self.rehearsal_required,
-            'recording_required': self.recording_required,
-            'technology_check': self.technology_check,
+            'Client_Needs_Recording': int(self.recording_required),
+            'Internal_Notes': self.project.notes,
+            'Internal_Company': self.project.client
         }
 
         # ProducersReq # TODO
+
+        response = submit_to_kissflow(data)
         return data
 
     def __str__(self):
@@ -176,8 +202,8 @@ class BiogenEvent(Event):
         verbose_name = "Biogen Event"
 
     def submit_to_kissflow(self):
-        data = super(BiogenEvent, self).submit_to_kissflow()
-        data['DocsLink'] = self.slide_deck_name
+        data = super(BiogenEvent, self).to_kissflow()
+        data['EventDocsLink'] = self.slide_deck_name
         data['ClientEventCode'] = self.slide_deck_id
 
         # MS / SMA
