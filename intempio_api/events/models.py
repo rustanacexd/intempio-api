@@ -134,7 +134,8 @@ class Event(StatusMixin, TimeStampedModel):
     def site_address(self):
         return 'Remote' if self.producer_required else ''
 
-    def to_kissflow(self):
+    @property
+    def to_kf_data(self):
         data = {
             'EventName': self.name,
             'ExpParticipants': self.participants_count,
@@ -151,8 +152,11 @@ class Event(StatusMixin, TimeStampedModel):
             'Internal_Company': self.project.invite_sent_by
         }
 
-        response = submit_to_kissflow(data)
         return data
+
+    def to_kissflow(self):
+        response = submit_to_kissflow(self.to_kf_data)
+        return response
 
     def __str__(self):
         return f'{self.name} - {self.pk}'
@@ -189,8 +193,6 @@ class BiogenEvent(Event):
         verbose_name = "Biogen Event"
 
     def to_kissflow(self):
-        data = super().to_kissflow()
+        data = self.to_kf_data
         data['ClientEventCode']: self.program_meeting_id
-
-        response = submit_to_kissflow(data)
-        return data
+        super(BiogenEvent, self).to_kissflow()
