@@ -156,6 +156,7 @@ class Event(StatusMixin, TimeStampedModel):
 
     def to_kissflow(self):
         response = submit_to_kissflow(self.to_kf_data)
+        self.status = 'accepted'
         return response
 
     def __str__(self):
