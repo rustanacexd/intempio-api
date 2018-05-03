@@ -136,32 +136,20 @@ class Event(StatusMixin, TimeStampedModel):
 
     def to_kissflow(self):
         data = {
-            'LeadContact': self.requestor_name,
-            'ContactPhone': self.phone,
-            'ContactEmail': self.email,
             'EventName': self.name,
-            'Duration': self.duration,
             'ExpParticipants': self.participants_count,
             'ExpectedPresenters': self.presenters_count,
             'PresentersList': self.presenters_list,
             'Client_Notes': self.notes,
-            'ProdHours': self.prod_hours,
-            'New_Event_Type': 'new',  # TODO
-            'StartEastern': self.start_time_est_formatted,
-            'ProdStartEastern': self.prod_start_est_formatted,
-            'EndTime': self.end_time_est_formatted,
-            # 'Project_Code': self.project.project_code,
-            # 'Project_ID': self.project.project_id,
-            # 'Customer': self.project.client,
+            'Hour_': str(self.start_time_est.hour),
+            'Minutes': str(self.start_time_est.minute),
+            'AMPM': self.period,
             'Is_this_Event_Onsite': int(self.producer_required),
-            'Onsite_Event_Address': self.site_address,  # TODO ALLOW NEW ADDRESS, ASK PARKER PRECAUTION OF ADDRESS
-            # 'EventDocsLink': '',
+            'Onsite_Event_Address': self.site_address,
             'Client_Needs_Recording': int(self.recording_required),
             'Internal_Notes': self.project.notes,
             'Internal_Company': self.project.invite_sent_by
         }
-
-        # ProducersReq # TODO
 
         response = submit_to_kissflow(data)
         return data
