@@ -8,7 +8,9 @@ from model_utils.fields import MonitorField, StatusField
 from model_utils.models import TimeStampedModel
 from simple_history.models import HistoricalRecords
 
-TO_KF_DATE_TIME_FORMAT = 'YYYY-MM-DD HH:MM'
+from intempio_api.events.helper import submit_to_kissflow
+
+TO_KF_DATE_TIME_FORMAT = 'YYYY-MM-DD HH:mm'
 
 
 class StatusMixin(object):
@@ -97,7 +99,7 @@ class Event(StatusMixin, TimeStampedModel):
 
     @property
     def end_time_est(self):
-        return self.start_time.to('US/Eastern')
+        return self.end_time.to('US/Eastern')
 
     @property
     def end_time_est_formatted(self):
@@ -130,33 +132,48 @@ class Event(StatusMixin, TimeStampedModel):
 
     @property
     def site_address(self):
-        return 'Remote' if self.producer_required else ''
+        return 'Remote' if not self.producer_required else ''
 
     @property
     def to_kf_data(self):
         data = {
-            'EventName': self.name,
-            'ExpParticipants': self.participants_count,
-            'ExpectedPresenters': self.presenters_count,
-            'PresentersList': self.presenters_list,
-            'Client_Notes': self.notes,
-            # 'Hour_': str(self.start_time_est.hour),
-            # 'Minutes': str(self.start_time_est.minute),
-            # 'AMPM': self.period,
-            'Is_this_Event_Onsite': int(self.producer_required),
-            'Onsite_Event_Address': self.site_address,
-            'Client_Needs_Recording': int(self.recording_required),
-            'Internal_Notes': self.project.notes,
-            'Internal_Company': self.project.invite_sent_by
+            'Client_Company_Name': self.project.client,
+            'Client_Project_Code': self.project.project_code,
+            'Client_Start_DateTime': self.start_time_est_formatted,
+            'Client_Start_Day': self.start_time_est.format('DD'),
+            'Client_Start_Month': self.start_time_est.format('MM'),
+            'Client_Start_Year': self.start_time_est.format('YYYY'),
+            'Client_Start_Hour': self.start_time_est.hour,
+            'Client_Start_Minutes': self.start_time_est.format('mm'),
+            'Client_Duration': self.duration,
+            'Client_End_Day': self.end_time_est.format('DD'),
+            'Client_End_Month': self.end_time_est.format('MM'),
+            'Client_End_Year': self.end_time_est.format('YYYY'),
+            'Client_End_Hour': self.end_time_est.hour,
+            'Client_End_Minutes': self.end_time_est.format('mm'),
+            'Client_EventName': self.name,
+            'Client_Onsite': int(self.producer_required),  # TODO
+            'Client_Address': self.site_address,
+            'Client_Participant_Count': self.participants_count,
+            'Client_Producer_Count': 0,  # TODO,
+            'Client_Presenter_Count': self.presenters_count,
+            'Client_Presenter_List': self.presenters_list,
+            'Client_Contact_Name': self.requestor_name,
+            'Client_Contact_Phone': self.phone,
+            'Client_Contact_Email': self.email,
+            'Client_Rehearsal': int(self.rehearsal_required),
+            'Client_Tech_Check': int(self.technology_check),
+            'Client_Recording_Required': int(self.recording_required),
+            'Client_Additional_Notes': self.notes,
         }
 
         return data
 
     def to_kissflow(self):
-        # response = submit_to_kissflow(self.to_kf_data)
+        response = submit_to_kissflow(self.to_kf_data)
         self.status = StatusMixin.STATUS.accepted
         self.save()
-        # return response
+        return response
 
     def __str__(self):
         return f'{self.name} - {self.pk}'
@@ -191,8 +208,3 @@ class BiogenEvent(Event):
         ordering = ['-modified', '-created']
         verbose_name_plural = "Biogen Events"
         verbose_name = "Biogen Event"
-
-    def to_kissflow(self):
-        data = self.to_kf_data
-        data['ClientEventCode']: self.program_meeting_id
-        super(BiogenEvent, self).to_kissflow()

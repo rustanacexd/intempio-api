@@ -29,7 +29,7 @@ def send_slack_notification(event_id, event_name, channel):
 def submit_to_kissflow(data):
     try:
         r = requests.post(
-            'https://kf-0002208.appspot.com/api/1/Event Creation/submit',
+            'https://kf-0002208.appspot.com/api/1/Client Event Submission/submit',
             json=data,
             headers={
                 'api_key': settings.KISSFLOW_API_KEY,
