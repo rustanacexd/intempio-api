@@ -8,8 +8,6 @@ from model_utils.fields import MonitorField, StatusField
 from model_utils.models import TimeStampedModel
 from simple_history.models import HistoricalRecords
 
-from intempio_api.events.helper import submit_to_kissflow
-
 TO_KF_DATE_TIME_FORMAT = 'YYYY-MM-DD HH:MM'
 
 
@@ -155,9 +153,10 @@ class Event(StatusMixin, TimeStampedModel):
         return data
 
     def to_kissflow(self):
-        response = submit_to_kissflow(self.to_kf_data)
+        # response = submit_to_kissflow(self.to_kf_data)
         self.status = StatusMixin.STATUS.accepted
-        return response
+        self.save()
+        # return response
 
     def __str__(self):
         return f'{self.name} - {self.pk}'
