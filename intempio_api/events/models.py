@@ -138,7 +138,7 @@ class Event(StatusMixin, TimeStampedModel):
     def to_kf_data(self):
         data = {
             'Client_Company_Name': self.project.client,
-            'Client_Project_Code': self.project.project_code,
+            'Client_Project_Code': self.project.project_id,
             'Client_Start_DateTime': self.start_time_est_formatted,
             'Client_Start_Day': self.start_time_est.format('DD'),
             'Client_Start_Month': self.start_time_est.format('MM'),

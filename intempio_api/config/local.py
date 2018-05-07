@@ -11,9 +11,9 @@ class Local(Common):
 
     # Testing
     INSTALLED_APPS = Common.INSTALLED_APPS
-    INSTALLED_APPS += ('django_nose', 'nplusone.ext.django')
+    INSTALLED_APPS += ('django_nose', 'nplusone.ext.django', 'debug_toolbar')
     MIDDLEWARE = Common.MIDDLEWARE
-    MIDDLEWARE += ('nplusone.ext.django.NPlusOneMiddleware',)
+    MIDDLEWARE += ('debug_toolbar.middleware.DebugToolbarMiddleware', 'nplusone.ext.django.NPlusOneMiddleware',)
     TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
     NOSE_ARGS = [
         BASE_DIR,
@@ -32,3 +32,4 @@ class Local(Common):
     ENVIRONMENT_NAME = 'LOCAL'
     NPLUSONE_LOGGER = logging.getLogger('nplusone')
     NPLUSONE_LOG_LEVEL = logging.WARN
+    INTERNAL_IPS = '127.0.0.1'
