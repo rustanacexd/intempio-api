@@ -170,10 +170,13 @@ class Event(StatusMixin, TimeStampedModel):
         return data
 
     def to_kissflow(self):
-        response = submit_to_kissflow(self.to_kf_data)
-        self.status = StatusMixin.STATUS.accepted
-        self.save()
-        return response
+        if self.status == StatusMixin.STATUS.reviewed:
+            response = submit_to_kissflow(self.to_kf_data)
+            self.status = StatusMixin.STATUS.accepted
+            self.save()
+            return response
+
+        return 'Status must be reviewed'
 
     def __str__(self):
         return f'{self.name} - {self.pk}'

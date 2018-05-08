@@ -1,7 +1,6 @@
 from django_filters import rest_framework as filters
 from rest_framework import mixins
 from rest_framework.decorators import list_route, detail_route
-from rest_framework.exceptions import APIException
 from rest_framework.exceptions import NotFound
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -10,7 +9,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
 from intempio_api.events.helper import send_slack_notification
-from intempio_api.events.models import BiogenEvent, SunovionEvent, Project, StatusMixin
+from intempio_api.events.models import BiogenEvent, SunovionEvent, Project
 from intempio_api.events.serializers import (
     SunovionEventSerializer, BiogenEventSerializer, ProjectSerializer,
     HistoricalBiogenEventSerializer,
@@ -68,11 +67,8 @@ class BiogenEventModelViewSet(ModelViewSet):
 
     @detail_route(methods=['GET', 'POST'])
     def submit_to_kissflow(self, request, pk=None):
-        if self.get_object().status == StatusMixin.STATUS.reviewed:
-            data = self.get_object().to_kissflow()
-            return Response(data)
-
-        raise APIException('Status must be reviewed')
+        data = self.get_object().to_kissflow()
+        return Response(data)
 
 
 class SunovionEventModelViewSet(ModelViewSet):
@@ -127,11 +123,8 @@ class SunovionEventModelViewSet(ModelViewSet):
 
     @detail_route(methods=['GET', 'POST'])
     def submit_to_kissflow(self, request, pk=None):
-        if self.get_object().status == StatusMixin.STATUS.reviewed:
-            data = self.get_object().to_kissflow()
-            return Response(data)
-
-        raise APIException('Status must be reviewed')
+        data = self.get_object().to_kissflow()
+        return Response(data)
 
 
 class ProjectModelViewSet(ModelViewSet):
