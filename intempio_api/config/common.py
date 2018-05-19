@@ -20,6 +20,7 @@ class Common(Configuration):
         # Third party apps
         'rest_framework',  # utilities for rest apis
         'rest_framework.authtoken',  # token authentication
+        'rest_auth',
         'django_filters',  # for filtering rest endpoints
         'django_extensions',
         'corsheaders',
@@ -28,7 +29,8 @@ class Common(Configuration):
 
         # Your apps
         'intempio_api.users',
-        'intempio_api.events'
+        'intempio_api.events',
+        'intempio_api.kissflow'
     )
 
     # https://docs.djangoproject.com/en/2.0/topics/http/middleware/
@@ -206,8 +208,8 @@ class Common(Configuration):
             # 'rest_framework.permissions.AllowAny',
         ],
         'DEFAULT_AUTHENTICATION_CLASSES': (
-            'rest_framework.authentication.SessionAuthentication',
             'rest_framework.authentication.TokenAuthentication',
+            'rest_framework.authentication.SessionAuthentication',
         ),
         'DEFAULT_METADATA_CLASS': None
     }
@@ -215,3 +217,7 @@ class Common(Configuration):
     CORS_ORIGIN_ALLOW_ALL = True
     KISSFLOW_API_KEY = os.getenv('KISSFLOW_API_KEY')
     KISSFLOW_EMAIL_ID = os.getenv('KISSFLOW_EMAIL_ID')
+
+    REST_AUTH_SERIALIZERS = {
+        'USER_DETAILS_SERIALIZER': 'intempio_api.users.serializers.UserSerializer',
+    }

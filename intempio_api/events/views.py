@@ -1,19 +1,20 @@
 from django_filters import rest_framework as filters
 from rest_framework import mixins
-from rest_framework.decorators import list_route, detail_route
+from rest_framework.decorators import detail_route, list_route
 from rest_framework.exceptions import NotFound
-from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.viewsets import ModelViewSet, GenericViewSet
+from rest_framework.viewsets import GenericViewSet, ModelViewSet
 
 from intempio_api.events.helper import send_slack_notification
-from intempio_api.events.models import BiogenEvent, SunovionEvent, Project
-from intempio_api.events.serializers import (
-    SunovionEventSerializer, BiogenEventSerializer, ProjectSerializer,
-    HistoricalBiogenEventSerializer,
-    HistoricalSunovionEventSerializer)
+from intempio_api.events.models import BiogenEvent, Project, SunovionEvent
+from intempio_api.events.serializers import (BiogenEventSerializer,
+                                             HistoricalBiogenEventSerializer,
+                                             HistoricalSunovionEventSerializer,
+                                             ProjectSerializer,
+                                             SunovionEventSerializer)
 
 
 class BiogenEventModelViewSet(ModelViewSet):

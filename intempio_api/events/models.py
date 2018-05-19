@@ -75,12 +75,6 @@ class Event(StatusMixin, TimeStampedModel):
         abstract = True
 
     @property
-    def prod_hours(self):
-        delta_difference = (self.end_time - self.start_time).total_seconds()
-        hours_difference = delta_difference / 60 / 60
-        return hours_difference
-
-    @property
     def start_time(self):
         arrow_obj = arrow.get(f'{self.date} {self.time}', 'YYYY-MM-DD hh:mm', tzinfo=self.timezone)
         return arrow_obj
@@ -104,18 +98,6 @@ class Event(StatusMixin, TimeStampedModel):
     @property
     def end_time_est_formatted(self):
         return self.end_time_est.format(TO_KF_DATE_TIME_FORMAT)
-
-    @property
-    def prod_start(self):
-        return self.start_time.shift(hours=-1)
-
-    @property
-    def prod_start_est(self):
-        return self.prod_start.to('US/Eastern')
-
-    @property
-    def prod_start_est_formatted(self):
-        return self.prod_start_est.format(TO_KF_DATE_TIME_FORMAT)
 
     @property
     def presenters_list(self):
@@ -189,12 +171,6 @@ class SunovionEvent(Event):
         ordering = ['-modified', '-created']
         verbose_name_plural = "Sunovion Events"
         verbose_name = "Sunovion Event"
-
-    @property
-    def prod_start(self):
-        if self.producer_required:
-            return self.start_time.shift(hours=-2)
-        return self.start_time.shift(hours=-1)
 
 
 class BiogenEvent(Event):
